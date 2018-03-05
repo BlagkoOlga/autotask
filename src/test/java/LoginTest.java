@@ -14,14 +14,7 @@ public class LoginTest extends BaseScript {
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         driver.get(getBaseAdminUrl());
 
-        WebElement loginField = driver.findElement(By.id("email"));
-        enterText(loginField, getAdminLogin());
-
-        WebElement passwordField = driver.findElement(By.id("passwd"));
-        enterText(passwordField, getAdminPassword());
-
-        WebElement loginButton = driver.findElement(By.name("submitLogin"));
-        loginButton.click();
+        loginIntoApplication(driver, getAdminLogin(), getAdminPassword());
 
         WebElement userIcon = driver.findElement(By.id("employee_infos"));
         userIcon.click();

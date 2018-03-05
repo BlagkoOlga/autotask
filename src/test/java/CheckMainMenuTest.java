@@ -1,9 +1,8 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static utils.Properties.*;
@@ -15,71 +14,31 @@ public class CheckMainMenuTest extends BaseScript {
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         driver.get(getBaseAdminUrl());
 
-        WebElement loginField = driver.findElement(By.id("email"));
-        enterText(loginField, getAdminLogin());
+        loginIntoApplication(driver, getAdminLogin(), getAdminPassword());
 
-        WebElement passwordField = driver.findElement(By.id("passwd"));
-        enterText(passwordField, getAdminPassword());
+        List<WebElement> menuElements = driver.findElements(By.cssSelector(".menu .maintab"));
 
-        WebElement loginButton = driver.findElement(By.name("submitLogin"));
-        loginButton.click();
+        for (int i = 1; i <= menuElements.size(); i++) {
+            Boolean isPresent = driver.findElements(By.cssSelector(".link-levelone")).size() >= 1;
+            System.out.println(isPresent);
+            if (isPresent) {
+                driver.navigate().back();
+            }
+            WebElement element = driver.findElement(By.xpath("//li[contains(@class, 'maintab')][" + i + "]//a//span"));
+            System.out.println(element.getText());
+            getTitleAfterRefresh(driver, element);
 
-        wait(driver, "tab-AdminDashboard");
-        WebElement dashboardItem = driver.findElement(By.id("tab-AdminDashboard"));
-        getTitleAfterRefresh(driver, dashboardItem);
-
-        wait(driver, "subtab-AdminParentOrders");
-        WebElement ordersItem = driver.findElement(By.id("subtab-AdminParentOrders"));
-        getTitleAfterRefresh(driver, ordersItem);
-
-        wait(driver, "subtab-AdminCatalog");
-        WebElement catalogItem = driver.findElement(By.id("subtab-AdminCatalog"));
-        getTitleAfterRefresh(driver, catalogItem);
-
-        //wait(driver, "subtab-AdminParentCustomer");
-        WebElement customersItem = driver.findElement(By.partialLinkText("AdminParentCustomers"));
-        getTitleAfterRefresh(driver, customersItem);
-
-        //wait(driver, "subtab-AdminParentCustomerThreads");
-        WebElement customersThreadsItem = driver.findElement(By.id("subtab-AdminParentCustomerThreads"));
-        getTitleAfterRefresh(driver, customersThreadsItem);
-
-        wait(driver, "ssubtab-AdminStats");
-        WebElement adminStatsItem = driver.findElement(By.id("ssubtab-AdminStats"));
-        getTitleAfterRefresh(driver, adminStatsItem);
-
-        wait(driver, "subtab-AdminParentModulesSf");
-        WebElement modulesItem = driver.findElement(By.id("subtab-AdminParentModulesSf"));
-        getTitleAfterRefresh(driver, modulesItem);
-
-        wait(driver, "subtab-AdminParentThemes");
-        WebElement designItem = driver.findElement(By.id("subtab-AdminParentThemes"));
-        getTitleAfterRefresh(driver, designItem);
-
-        wait(driver, "subtab-AdminParentShipping");
-        WebElement shippingItem = driver.findElement(By.id("subtab-AdminParentShipping"));
-        getTitleAfterRefresh(driver, shippingItem);
-
-        wait(driver, "subtab-AdminParentPayment");
-        WebElement paymentItem = driver.findElement(By.id("subtab-AdminParentPayment"));
-        getTitleAfterRefresh(driver, paymentItem);
-
-        wait(driver, "subtab-AdminInternational");
-        WebElement internationalItem = driver.findElement(By.id("subtab-AdminInternational"));
-        getTitleAfterRefresh(driver, internationalItem);
-
-        wait(driver, "subtab-ShopParameters");
-        WebElement shopParametersItem = driver.findElement(By.id("subtab-ShopParameters"));
-        getTitleAfterRefresh(driver, shopParametersItem);
-
-        wait(driver, "subtab-AdminAdvancedParameters");
-        WebElement configItem = driver.findElement(By.id("subtab-AdminAdvancedParameters"));
-        getTitleAfterRefresh(driver, configItem);
+        }
 
     }
 
-    private static void wait(WebDriver driver, String locator) {
-        WebElement explicitWait = (new WebDriverWait(driver, 10)).until(ExpectedConditions.presenceOfElementLocated(By.id(locator)));
+    private static void getTitleAfterRefresh(WebDriver driver, WebElement element) {
+        element.click();
+        String title = driver.getTitle();
+        System.out.println(title);
+        driver.navigate().refresh();
+        String titleAfter = driver.getTitle();
+        System.out.println(titleAfter);
+        assert (title.equals(titleAfter));
     }
-
 }
